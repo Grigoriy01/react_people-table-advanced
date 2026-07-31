@@ -48,7 +48,7 @@ src/
       Loader.scss
       Loader.tsx
     peopleFilters/
-      CenturiesFiiter.tsx
+      CenturiesFilter.tsx
       PeopleFilters.tsx
       SearchFilter.tsx
       SexFilter.tsx
@@ -77,18 +77,61 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/components/peopleFilters/CenturiesFiiter.tsx">
+<file path="src/components/Loader/index.tsx">
+export * from './Loader';
+</file>
+
+<file path="src/components/Loader/Loader.scss">
+.Loader {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  &__content {
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    margin: 1em auto;
+    border: 0.3em solid #ddd;
+    border-left-color: #000;
+    animation: load8 1.2s infinite linear;
+  }
+}
+
+@keyframes load8 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</file>
+
+<file path="src/components/Loader/Loader.tsx">
+import './Loader.scss';
+
+export const Loader = () => (
+  <div className="Loader" data-cy="loader">
+    <div className="Loader__content" />
+  </div>
+);
+</file>
+
+<file path="src/components/peopleFilters/CenturiesFilter.tsx">
 import { useSearchParams } from 'react-router-dom';
 import { SearchLink } from '../SearchLink';
 import cn from 'classnames';
 
-export const CenturiesFiiter = () => {
+export const CenturiesFilter = () => {
   const [searchParams] = useSearchParams();
 
   const selectedCenturies = searchParams.getAll('centuries');
   const isActiveClass = selectedCenturies.length !== 0;
 
   const CENTURIES = ['16', '17', '18', '19', '20'];
+
   return (
     <>
       <div className="panel-block">
@@ -138,7 +181,7 @@ export const CenturiesFiiter = () => {
 
 <file path="src/components/peopleFilters/PeopleFilters.tsx">
 import { Link } from 'react-router-dom';
-import { CenturiesFiiter } from './CenturiesFiiter';
+import { CenturiesFilter } from './CenturiesFilter';
 import { SexFilter } from './SexFilter';
 import { SearchFilter } from './SearchFilter';
 
@@ -149,7 +192,7 @@ export const PeopleFilters = () => {
 
       <SexFilter />
       <SearchFilter />
-      <CenturiesFiiter />
+      <CenturiesFilter />
 
       <div className="panel-block">
         <Link className="button is-link is-outlined is-fullwidth" to="/people">
@@ -162,8 +205,8 @@ export const PeopleFilters = () => {
 </file>
 
 <file path="src/components/peopleFilters/SearchFilter.tsx">
-import { useSearchParams } from "react-router-dom";
-import { getSearchWith } from "../../utils/searchHelper";
+import { useSearchParams } from 'react-router-dom';
+import { getSearchWith } from '../../utils/searchHelper';
 
 export const SearchFilter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -173,65 +216,65 @@ export const SearchFilter = () => {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newText = event.target.value;
 
-    const newSearch = getSearchWith(searchParams, {query: newText || null})
+    const newSearch = getSearchWith(searchParams, { query: newText || null });
 
-    setSearchParams(newSearch)
-  }
+    setSearchParams(newSearch);
+  };
 
   return (
     <div className="panel-block">
-        <p className="control has-icons-left">
-          <input
-            value={q}
-            data-cy="NameFilter"
-            type="search"
-            className="input"
-            placeholder="Search"
-            onChange={handleOnChange}
-          />
+      <p className="control has-icons-left">
+        <input
+          value={q}
+          data-cy="NameFilter"
+          type="search"
+          className="input"
+          placeholder="Search"
+          onChange={handleOnChange}
+        />
 
-          <span className="icon is-left">
-            <i className="fas fa-search" aria-hidden="true" />
-          </span>
-        </p>
-      </div>
+        <span className="icon is-left">
+          <i className="fas fa-search" aria-hidden="true" />
+        </span>
+      </p>
+    </div>
   );
 };
 </file>
 
 <file path="src/components/peopleFilters/SexFilter.tsx">
-import { useSearchParams  } from "react-router-dom";
-import { SearchLink } from "../SearchLink";
-import cn from "classnames";
+import { useSearchParams } from 'react-router-dom';
+import { SearchLink } from '../SearchLink';
+import cn from 'classnames';
 
 export const SexFilter = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
 
-  const selectedSex = searchParams.get('sex')
+  const selectedSex = searchParams.get('sex');
 
   return (
     <p className="panel-tabs" data-cy="SexFilter">
-        <SearchLink
-          className={cn({'is-active': !selectedSex})}
-          params={{sex: null}}
-        >
-          All
-        </SearchLink>
+      <SearchLink
+        className={cn({ 'is-active': !selectedSex })}
+        params={{ sex: null }}
+      >
+        All
+      </SearchLink>
 
-        <SearchLink
-          className={cn({'is-active': selectedSex === 'm'})}
-          params={{sex: 'm'}}
-        >
-          Male
-        </SearchLink>
+      <SearchLink
+        className={cn({ 'is-active': selectedSex === 'm' })}
+        params={{ sex: 'm' }}
+      >
+        Male
+      </SearchLink>
 
-        <SearchLink
-          className={cn({'is-active': selectedSex === 'f'})}
-          params={{sex: 'f'}}
-        >
-          Female
-        </SearchLink>
-      </p>
+      <SearchLink
+        className={cn({ 'is-active': selectedSex === 'f' })}
+        params={{ sex: 'f' }}
+      >
+        Female
+      </SearchLink>
+    </p>
   );
 };
 </file>
@@ -260,12 +303,17 @@ type Props = {
 export const PersonLink: React.FC<Props> = ({ person }) => {
   const isFemale = person?.sex === 'f';
   const linkClass = isFemale ? 'has-text-danger' : '';
+
   return (
     <Link to={`/people/${person.slug}`} className={linkClass}>
       {person.name}
     </Link>
   );
 };
+</file>
+
+<file path="src/types/index.ts">
+export * from './Person';
 </file>
 
 <file path="src/types/SortField.ts">
@@ -284,7 +332,7 @@ export function filterPeople(
 
   const sex = searchParams.get('sex');
   const query = searchParams.get('query');
-  const centuries = searchParams.get('centuries');
+  const centuries = searchParams.getAll('centuries');
   const sort = searchParams.get('sort') as SortField | null;
   const order = searchParams.get('order');
 
@@ -294,15 +342,26 @@ export function filterPeople(
 
   if (query) {
     const normalizeQuery = query.trim().toLowerCase();
-    filteredPeople = filteredPeople.filter(person =>
-      person.name.toLowerCase().includes(normalizeQuery),
-    );
+
+    filteredPeople = filteredPeople.filter(person => {
+      const personName = person.name.toLowerCase().includes(normalizeQuery);
+      const motherName = person.motherName
+        ?.toLowerCase()
+        .includes(normalizeQuery);
+      const fatherName = person.fatherName
+        ?.toLowerCase()
+        .includes(normalizeQuery);
+
+      return personName || motherName || fatherName;
+    });
   }
 
-  if (centuries) {
-    filteredPeople = filteredPeople.filter(
-      person => Math.ceil(person.born / 100) === +centuries,
-    );
+  if (centuries.length > 0) {
+    filteredPeople = filteredPeople.filter(person => {
+      const century = Math.ceil(person.born / 100).toString();
+
+      return centuries.includes(century);
+    });
   }
 
   if (sort) {
@@ -311,10 +370,14 @@ export function filterPeople(
 
       switch (sort) {
         case 'name':
-          result = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+          result = a.name.localeCompare(b.name, undefined, {
+            sensitivity: 'base',
+          });
           break;
         case 'sex':
-          result = a.sex.localeCompare(b.sex, undefined, { sensitivity: 'base' });
+          result = a.sex.localeCompare(b.sex, undefined, {
+            sensitivity: 'base',
+          });
           break;
         case 'born':
           result = a.born - b.born;
@@ -322,7 +385,6 @@ export function filterPeople(
         case 'died':
           result = a.died - b.died;
           break;
-
       }
 
       return order === 'desc' ? -result : result;
@@ -333,185 +395,8 @@ export function filterPeople(
 }
 </file>
 
-<file path="src/components/Loader/index.tsx">
-export * from './Loader';
-</file>
-
-<file path="src/components/Loader/Loader.scss">
-.Loader {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-
-  &__content {
-    border-radius: 50%;
-    width: 2em;
-    height: 2em;
-    margin: 1em auto;
-    border: 0.3em solid #ddd;
-    border-left-color: #000;
-    animation: load8 1.2s infinite linear;
-  }
-}
-
-@keyframes load8 {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-</file>
-
-<file path="src/components/Loader/Loader.tsx">
-import './Loader.scss';
-
-export const Loader = () => (
-  <div className="Loader" data-cy="loader">
-    <div className="Loader__content" />
-  </div>
-);
-</file>
-
-<file path="src/types/index.ts">
-export * from './Person';
-</file>
-
 <file path="src/vite-env.d.ts">
 /// <reference types="vite/client" />
-</file>
-
-<file path="src/components/Navbar.tsx">
-import classNames from "classnames";
-import { NavLink } from "react-router-dom";
-
-interface Options {
-  isActive: boolean;
-}
-
-export const Navbar = () => {
-  const isActiveClass = ({isActive}: Options) => classNames(
-    'navbar-item', {'has-background-grey-lighter': isActive}
-  )
-  return (
-    <nav
-      data-cy="nav"
-      className="navbar is-fixed-top has-shadow"
-      role="navigation"
-      aria-label="main navigation"
-    >
-      <div className="container">
-        <div className="navbar-brand">
-          <NavLink
-            className={isActiveClass}
-            to="/"
-          >
-            Home
-          </NavLink>
-
-          <NavLink
-            aria-current="page"
-            className={isActiveClass}
-            to="/people"
-          >
-            People
-          </NavLink>
-        </div>
-      </div>
-    </nav>
-  );
-};
-</file>
-
-<file path="src/components/PeoplePage.tsx">
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-
-import { Person } from '../types';
-import { PeopleFilters } from './peopleFilters/PeopleFilters';
-import { Loader } from './Loader';
-import { PeopleTable } from './PeopleTable';
-
-import { getPeople } from '../api';
-import { filterPeople } from '../utils/filterPeople';
-
-export const PeoplePage = () => {
-  const [people, setPeople] = useState<Person[]>([]);
-  const [searchParams] = useSearchParams()
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getPeople();
-        setPeople(data);
-        setIsError(null);
-      } catch {
-        setIsError('Something went wrong');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  const visiblePeople = useMemo(
-    function() {
-      return filterPeople(people, searchParams)
-    }, [people, searchParams]
-  );
-
-
-  const renderContent = () => {
-    const isNotPeople = people.length === 0;
-    const isNotVisiblePeople = visiblePeople.length === 0;
-
-    if (isError) {
-      return (
-        <p data-cy="peopleLoadingError" className="has-text-danger">
-          {isError}
-        </p>
-      );
-    }
-
-    if (isNotPeople) {
-      return <p data-cy="noPeopleMessage">There are no people on the server</p>;
-    }
-
-    if (isNotVisiblePeople) {
-      return <p>There are no people matching the current search criteria</p>;
-    }
-
-    return <PeopleTable people={visiblePeople} />;
-  };
-
-
-
-  return (
-    <>
-      <h1 className="title">People Page</h1>
-
-      <div className="block">
-        <div className="columns is-desktop is-flex-direction-row-reverse">
-          {!isLoading &&
-            <div className="column is-7-tablet is-narrow-desktop">
-            <PeopleFilters />
-          </div>}
-
-          <div className="column">
-            <div className="box table-container">
-              {isLoading ? <Loader /> : renderContent()}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
 </file>
 
 <file path="src/components/SearchLink.tsx">
@@ -614,6 +499,156 @@ export function getSearchWith(
 }
 </file>
 
+<file path="src/components/Navbar.tsx">
+import classNames from 'classnames';
+import { NavLink } from 'react-router-dom';
+
+interface Options {
+  isActive: boolean;
+}
+
+export const Navbar = () => {
+  const isActiveClass = ({ isActive }: Options) =>
+    classNames('navbar-item', { 'has-background-grey-lighter': isActive });
+
+  return (
+    <nav
+      data-cy="nav"
+      className="navbar is-fixed-top has-shadow"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div className="container">
+        <div className="navbar-brand">
+          <NavLink className={isActiveClass} to="/">
+            Home
+          </NavLink>
+
+          <NavLink aria-current="page" className={isActiveClass} to="/people">
+            People
+          </NavLink>
+        </div>
+      </div>
+    </nav>
+  );
+};
+</file>
+
+<file path="src/components/PeoplePage.tsx">
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import { Person } from '../types';
+import { PeopleFilters } from './peopleFilters/PeopleFilters';
+import { Loader } from './Loader';
+import { PeopleTable } from './PeopleTable';
+
+import { getPeople } from '../api';
+import { filterPeople } from '../utils/filterPeople';
+
+export const PeoplePage = () => {
+  const [people, setPeople] = useState<Person[]>([]);
+  const [searchParams] = useSearchParams();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getPeople();
+
+        setPeople(data);
+        setIsError(null);
+      } catch {
+        setIsError('Something went wrong');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const visiblePeople = useMemo(
+    function () {
+      return filterPeople(people, searchParams);
+    },
+    [people, searchParams],
+  );
+
+  const renderContent = () => {
+    const isNotPeople = people.length === 0;
+    const isNotVisiblePeople = visiblePeople.length === 0;
+
+    if (isError) {
+      return (
+        <p data-cy="peopleLoadingError" className="has-text-danger">
+          {isError}
+        </p>
+      );
+    }
+
+    if (isNotPeople) {
+      return <p data-cy="noPeopleMessage">There are no people on the server</p>;
+    }
+
+    if (isNotVisiblePeople) {
+      return <p>There are no people matching the current search criteria</p>;
+    }
+
+    return <PeopleTable people={visiblePeople} />;
+  };
+
+  return (
+    <>
+      <h1 className="title">People Page</h1>
+
+      <div className="block">
+        <div className="columns is-desktop is-flex-direction-row-reverse">
+          {!isLoading && (
+            <div className="column is-7-tablet is-narrow-desktop">
+              <PeopleFilters />
+            </div>
+          )}
+
+          <div className="column">
+            <div className="box table-container">
+              {isLoading ? <Loader /> : renderContent()}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+</file>
+
+<file path="src/api.ts">
+import { Person } from './types/Person';
+
+// eslint-disable-next-line operator-linebreak
+const API_URL =
+  'https://mate-academy.github.io/react_people-table/api/people.json';
+
+function wait(delay: number) {
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+export async function getPeople(): Promise<Person[]> {
+  // keep this delay for testing purpose
+  return wait(500)
+    .then(() => fetch(API_URL))
+    .then(response => response.json());
+}
+</file>
+
+<file path="src/App.scss">
+iframe {
+  display: none;
+}
+</file>
+
 <file path="src/components/PeopleTable.tsx">
 import { useParams, useSearchParams } from 'react-router-dom';
 import { SearchLink } from './SearchLink';
@@ -635,9 +670,17 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
   const selectedOrder = searchParams.get('order');
 
   const THEAD_NAMES: SortField[] = ['name', 'sex', 'born', 'died'];
+  const FIELD_NAMES: Record<SortField, string> = {
+    name: 'Name',
+    sex: 'Sex',
+    born: 'Born',
+    died: 'Died',
+  };
 
   const findPersonByName = (name: string): Person | null => {
-    if (!name) return null;
+    if (!name) {
+      return null;
+    }
 
     const foundPerson = people.find(person => person.name === name);
 
@@ -645,7 +688,9 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
   };
 
   const renderParentCell = (parentName: string | null) => {
-    if (!parentName) return '-';
+    if (!parentName) {
+      return '-';
+    }
 
     const parentPerson = findPersonByName(parentName);
 
@@ -693,8 +738,8 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
         <tr>
           {THEAD_NAMES.map(title => (
             <th key={title}>
-              <span className="is-flex is-flex-wrap-nowrap">
-                {title}
+              <span className="is-flex is-flex-wrap-nowrap is-capitalized">
+                {FIELD_NAMES[title]}
                 <SearchLink
                   params={handleTheadFilters(
                     title,
@@ -728,10 +773,10 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
               <td>
                 <PersonLink person={person} />
               </td>
-              <td>{person.sex} </td>
+              <td>{person.sex}</td>
               <td>{person.born}</td>
               <td>{person.died}</td>
-              <td>{renderParentCell(person.motherName)} </td>
+              <td>{renderParentCell(person.motherName)}</td>
               <td>{renderParentCell(person.fatherName)}</td>
             </tr>
           );
@@ -742,29 +787,20 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
 };
 </file>
 
-<file path="src/api.ts">
-import { Person } from './types/Person';
+<file path="src/index.tsx">
+import { createRoot } from 'react-dom/client';
+import { HashRouter as Router } from 'react-router-dom';
 
-// eslint-disable-next-line operator-linebreak
-const API_URL =
-  'https://mate-academy.github.io/react_people-table/api/people.json';
+import 'bulma/css/bulma.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 
-function wait(delay: number) {
-  return new Promise(resolve => setTimeout(resolve, delay));
-}
+import { App } from './App';
 
-export async function getPeople(): Promise<Person[]> {
-  // keep this delay for testing purpose
-  return wait(500)
-    .then(() => fetch(API_URL))
-    .then(response => response.json());
-}
-</file>
-
-<file path="src/App.scss">
-iframe {
-  display: none;
-}
+createRoot(document.getElementById('root') as HTMLDivElement).render(
+  <Router>
+    <App />
+  </Router>,
+);
 </file>
 
 <file path="src/App.tsx">
@@ -785,33 +821,17 @@ export const App = () => {
         <div className="container">
           <Routes>
             <Route index element={<HomePage />} />
-            <Route path='/people' element={<PeoplePage />}>
-              <Route path=':slug' element={<PeoplePage />} />
+            <Route path="/people" element={<PeoplePage />}>
+              <Route path=":slug" element={<PeoplePage />} />
             </Route>
-            <Route path='home' element={<Navigate to='/' replace/>} />
-            <Route path='*' element={<NotFoundPage />} />
+            <Route path="home" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>
       </div>
     </div>
   );
 };
-</file>
-
-<file path="src/index.tsx">
-import { createRoot } from 'react-dom/client';
-import { HashRouter as Router } from 'react-router-dom';
-
-import 'bulma/css/bulma.css';
-import '@fortawesome/fontawesome-free/css/all.css';
-
-import { App } from './App';
-
-createRoot(document.getElementById('root') as HTMLDivElement).render(
-  <Router>
-    <App />
-  </Router>,
-);
 </file>
 
 <file path="README.md">
@@ -845,7 +865,7 @@ implement the ability to filter and sort people in the table.
 - Implement a solution following the [React task guideline](https://github.com/mate-academy/react_task-guideline#react-tasks-guideline).
 - Use the [React TypeScript cheat sheet](https://mate-academy.github.io/fe-program/js/extra/react-typescript).
 - Open one more terminal and run tests with `npm test` to ensure your solution is correct.
-- Replace `<your_account>` with your Github username in the [DEMO LINK](https://<your_account>.github.io/react_people-table-advanced/) and add it to the PR description.
+- Replace `<your_account>` with your Github username in the [DEMO LINK](https://Grigoriy01.github.io/react_people-table-advanced/) and add it to the PR description.
 </file>
 
 </files>
